@@ -29,7 +29,7 @@ async def is_admin(event):
     return user.is_admin
 
 # handle tag all members command
-@client.on(events.NewMessage(pattern=r"/(tagall|ناديلي_الفحلات)"))
+@client.on(events.NewMessage(pattern=r"/(tagall|ناديلي_الفحلات)")) #she want to say tagall OR ... 
 async def handler(event):
     if await is_admin(event):
         await tagAll(event)
@@ -38,7 +38,7 @@ async def handler(event):
         
 # handle /admins command
 @client.on(events.NewMessage(pattern='/admins'))
-async def handler(event):
+async def admins_handler(event):
     if await is_admin(event):
         await tagAdmins(event)
     else:
