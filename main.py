@@ -3,17 +3,24 @@ from utilities import client
 from tagAll import tagAll
 from tagAdmins import tagAdmins
 
-# get suggestions of the bots commands when writing "/"
+## get suggestions of the bots commands when writing "/"
 async def set_bot_commands():
-    await client(functions.bots.SetBotCommandsRequest(
-        scope=types.BotCommandScopeDefault(),
-        lang_code='ar',
-        commands=[
-            types.BotCommand(command='tagall', description='مناداة جميع الأعضاء'),
-            types.BotCommand(command='admins', description='مناداة جميع المشرفين'),
-            types.BotCommand(command='stop', description='إيقاف تشغيل البوت'),
-        ]
-    ))
+    print("🟡 set_bot_commands() is being called...")
+
+    try:
+        await client(functions.bots.SetBotCommandsRequest(
+            scope=types.BotCommandScopeDefault(),
+            lang_code='ar',
+            commands=[
+                types.BotCommand(command='tagall', description='مناداة جميع الأعضاء'),
+                types.BotCommand(command='admins', description='مناداة جميع المشرفين'),
+                types.BotCommand(command='stop', description='إيقاف تشغيل البوت'),
+            ],
+        ))
+        print("✅ Bot commands registered successfully.")
+    except Exception as e:
+        print("❌ Failed to set bot commands:", e)
+
 
 # start the bot
 @client.on(events.NewMessage(pattern='/start'))
