@@ -15,6 +15,13 @@ async def set_bot_commands():
         ]
     ))
 
+# Check if there is no thrown exceptions
+async def safe_reply(event, text, **kwargs):
+    try:
+        await event.reply(text, **kwargs)
+    except Exception as e:
+        print(f"⚠️ Failed to send message in chat {event.chat_id}: {e}")
+
 # Check if the sender is an admin
 async def is_admin(event):
     if event.is_private:
@@ -46,7 +53,7 @@ async def start_handler(event):
 @client.on(events.NewMessage(pattern=r"/(tagall|ناديلي_الفحلات)"))
 async def handler(event):
     if not await is_bot_admin(event):
-        await event.reply("🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
+        await safe_reply(event, "🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
         return
     if await is_admin(event):
         await tagAll(event)
@@ -57,7 +64,7 @@ async def handler(event):
 @client.on(events.NewMessage(pattern='/admins'))
 async def handler_admins(event):
     if not await is_bot_admin(event):
-        await event.reply("🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
+        await safe_reply(event, "🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
         return
     if await is_admin(event):
         await tagAdmins(event)
@@ -68,7 +75,7 @@ async def handler_admins(event):
 @client.on(events.NewMessage(pattern='/stop'))
 async def handler_stop(event):
     if not await is_bot_admin(event):
-        await event.reply("🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
+        await safe_reply(event, "🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
         return
     if await is_admin(event):
         await event.reply("🛑 تم إيقاف تشغيل البوت.")
