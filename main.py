@@ -3,7 +3,7 @@ from utilities import client
 from tagAll import tagAll
 from tagAdmins import tagAdmins
 
-# get suggestions of the bots commands when writing "/"
+# Get bot suggestions when typing "/"
 async def set_bot_commands():
     await client(functions.bots.SetBotCommandsRequest(
         scope=types.BotCommandScopeDefault(),
@@ -15,44 +15,67 @@ async def set_bot_commands():
         ]
     ))
 
-# start the bot
+# Check if the sender is an admin
+async def is_admin(event):
+    if event.is_private:
+        return False
+    try:
+        user = await event.client.get_permissions(event.chat_id, event.sender_id)
+        return user.is_admin
+    except:
+        return False
+
+# Check if the bot itself is an admin
+async def is_bot_admin(event):
+    if event.is_private:
+        return False
+    try:
+        me = await event.client.get_me()
+        bot_perms = await event.client.get_permissions(event.chat_id, me.id)
+        return bot_perms.is_admin
+    except:
+        return False
+
+# Bot start handler
 @client.on(events.NewMessage(pattern='/start'))
 async def start_handler(event):
     await set_bot_commands()
     await event.respond("🤖 البوت جاهز! اكتب '/' لرؤية الأوامر.")
 
-# check if the sender is an admin
-async def is_admin(event):
-    if event.is_private:
-        return False
-    user = await event.client.get_permissions(event.chat_id, event.sender_id)
-    return user.is_admin
-
-# handle tag all members command
+# Tag all members
 @client.on(events.NewMessage(pattern=r"/(tagall|ناديلي_الفحلات)"))
 async def handler(event):
+    if not await is_bot_admin(event):
+        await event.reply("🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
+        return
     if await is_admin(event):
         await tagAll(event)
     else:
         await event.reply("🚫 المشرفون فقط من يمكنهم استخدام هذا البوت")
-        
-# handle /admins command
+
+# Tag admins
 @client.on(events.NewMessage(pattern='/admins'))
-async def handler(event):
+async def handler_admins(event):
+    if not await is_bot_admin(event):
+        await event.reply("🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
+        return
     if await is_admin(event):
         await tagAdmins(event)
     else:
         await event.reply("🚫 المشرفون فقط من يمكنهم استخدام هذا البوت")
 
-# handle /stop command
+# Stop the bot
 @client.on(events.NewMessage(pattern='/stop'))
 async def handler_stop(event):
+    if not await is_bot_admin(event):
+        await event.reply("🚫 لا يمكنني العمل لأنني لست مشرفاً في هذه المجموعة.")
+        return
     if await is_admin(event):
         await event.reply("🛑 تم إيقاف تشغيل البوت.")
-        await client.disconnect()  # This will stop the bot
+        await client.disconnect()
     else:
         await event.reply("🚫 المشرفون فقط يمكنهم إيقاف تشغيل البوت")
 
-# running bot
+# Start the bot
 print("Bot is running...")
 client.run_until_disconnected()
